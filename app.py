@@ -114,7 +114,7 @@ def classify_image(image, model, transform_fn, id2label_map):
         return id2label_map[pred_index]
 
 # --- Streamlit App UI ---
-st.title("👁️ AI Medical Image Analyzer")
+st.title("👁️ AI Eye Image Analyzer")
 st.write("Upload a medical image to get a classification and AI-powered advice.")
 st.warning("**Disclaimer:** This tool is for educational purposes only and is not a substitute for professional medical advice.", icon="⚠️")
 
