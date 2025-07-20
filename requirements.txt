@@ -1,4 +1,7 @@
 streamlit
+google-generativeai
 torch
 torchvision
+gtts
+deep-translator
 pillow
