@@ -6,8 +6,8 @@ This project is a web-based application designed for the early detection of comm
 
 ### 🚀 Live Demo
 
--   **Main Landing Page:** [https://eye-diseases.vercel.app/](https://eye-diseases.vercel.app/)
--   **Analyzer Tool:** [https://eyediseases.streamlit.app/](https://eyediseases.streamlit.app/)
+-   **Main Landing Page:** [![Deployed on Vercel](https://eye-diseases.vercel.appl)
+-   **Analyzer Tool:** [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://eyediseases.streamlit.app/)
 
 ---
 
@@ -87,8 +87,8 @@ To run this project locally, follow these steps:
 
 **2. Clone the Repository:**
 ```bash
-git clone [https://github.com/YOUR_USERNAME/YOUR_REPOSITORY_NAME.git](https://github.com/YOUR_USERNAME/YOUR_REPOSITORY_NAME.git)
-cd YOUR_REPOSITORY_NAME
+git clone https://github.com/Venky8249/Eye_diseases.git
+cd Eye_diseases
 ```
 
 **3. Set Up a Virtual Environment (Recommended):**
