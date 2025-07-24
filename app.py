@@ -172,7 +172,7 @@ def classify_image(image, model, transform_fn, id2label_map):
 st.title("👁️ AI Eye Image Analyzer")
 
 # Display the modern Home Button
-st.markdown('<a href="index.html" target="_self" class="home-button">🏠 Home</a>', unsafe_allow_html=True)
+st.markdown('<a href="https://eye-diseases.vercel.app/" target="_self" class="home-button">🏠 Home</a>', unsafe_allow_html=True)
 
 st.write("Upload a medical image to get a classification and AI-powered advice.")
 st.warning("**Disclaimer:** This tool is for educational purposes only and is not a substitute for professional medical advice.", icon="⚠️")
