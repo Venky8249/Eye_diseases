@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Eye Disease Analyzer - Home</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <style>
+        /* --- Basic Setup & Variables --- */
+        :root {
+            --bg-dark: #0d0c22;
+            --bg-gradient-end: #03045e;
+            --text-primary: #ffffff;
+            --text-secondary: #adb5bd;
+            --accent-start: #00f5d4;
+            --accent-end: #00b4d8;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.7;
+        }
+
+        /* --- Header / Navbar --- */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(13, 12, 34, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .navbar a {
+            margin-left: 35px;
+            font-size: 1rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            color: var(--accent-end);
+        }
+
+        /* --- Hero Section --- */
+        .hero-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12rem 2rem 8rem; /* Added top padding for header */
+            text-align: center;
+            background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-gradient-end) 100%);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .hero-content h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .hero-content .highlight {
+            background: linear-gradient(45deg, var(--accent-start), var(--accent-end));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 1rem auto 2.5rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 14px 32px;
+            background-image: linear-gradient(45deg, #0077b6 0%, var(--accent-end) 100%);
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 180, 216, 0.3);
+        }
+
+        /* --- General Section Styling --- */
+        .section {
+            padding: 5rem 2rem;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+        }
+
+        /* --- How It Works Section --- */
+        .steps-container {
+            display: flex;
+            justify-content: space-around;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .step {
+            flex: 1;
+            position: relative;
+        }
+
+        .step-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .step-icon i {
+            font-size: 2.5rem;
+            color: var(--accent-end);
+        }
+
+        .step h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .step p {
+            color: var(--text-secondary);
+        }
+
+        /* --- Technology Section --- */
+        .tech-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .tech-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .tech-card i {
+            font-size: 3.5rem;
+            color: var(--accent-end);
+            margin-bottom: 1rem;
+        }
+
+        .tech-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tech-card p {
+            color: var(--text-secondary);
+        }
+
+        /* --- Information Section --- */
+        .expanders-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .expander {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .expander[open] {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .expander summary {
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 1.5rem;
+            cursor: pointer;
+            list-style: none; /* Remove default arrow */
+            position: relative;
+        }
+
+        .expander summary::after { /* Custom arrow */
+            content: '+';
+            position: absolute;
+            right: 1.5rem;
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .expander[open] summary::after {
+            transform: rotate(45deg);
+        }
+
+        .expander p {
+            padding: 0 1.5rem 1.5rem 1.5rem;
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* --- Animation Classes --- */
+        .animate-on-load {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fade-in-up 1s forwards;
+            animation-delay: 0.3s;
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes fade-in-up {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            .navbar {
+                display: none; /* Hiding nav for simplicity, can be replaced with a mobile menu */
+            }
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            .hero-content p {
+                font-size: 1rem;
+            }
+            .section-title {
+                font-size: 2rem;
+            }
+            .tech-container, .steps-container {
+                grid-template-columns: 1fr;
+                flex-direction: column;
+            }
+            .expander summary {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <a href="#" class="logo">EyeCare AI</a>
+        <nav class="navbar">
+            <a href="#how-it-works">How It Works</a>
+            <a href="#technology">Our Technology</a>
+            <a href="#diseases">About Diseases</a>
+            <a href="https://eyediseases.streamlit.app/">Analyzer Tool</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content animate-on-load">
+            <h1>Welcome to the Future of <span class="highlight">Eye Care</span></h1>
+            <p>Utilizing state-of-the-art AI to provide rapid, accessible, and accurate screening for common eye diseases. Early detection is the key to preserving sight.</p>
+            <div class="cta-button-wrapper">
+                <a href="https://eyediseases.streamlit.app/" class="cta-button">Launch Analyzer Tool</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="section">
+        <h2 class="section-title animate-on-scroll">How It Works</h2>
+        <div class="steps-container">
+            <div class="step animate-on-scroll">
+                <div class="step-icon"><i class='bx bxs-cloud-upload'></i></div>
+                <h3>1. Upload Image</h3>
+                <p>Securely upload a retinal scan image from your device.</p>
+            </div>
+            <div class="step animate-on-scroll">
+                <div class="step-icon"><i class='bx bxs-brain'></i></div>
+                <h3>2. AI Analysis</h3>
+                <p>Our dual-AI system classifies the image and generates a detailed report.</p>
+            </div>
+            <div class="step animate-on-scroll">
+                <div class="step-icon"><i class='bx bxs-file-find'></i></div>
+                <h3>3. Get Results</h3>
+                <p>Instantly view the classification and listen to AI-generated advice.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Technology Section -->
+    <section id="technology" class="section">
+        <h2 class="section-title animate-on-scroll">Our Dual-AI Technology</h2>
+        <div class="tech-container">
+            <div class="tech-card animate-on-scroll">
+                <i class='bx bxs-layer'></i>
+                <h3>Trained Classification Model</h3>
+                <p>
+                    Our core analysis uses a **Transfer Learning** approach. We started with a powerful, pre-trained **ResNet-18** model and fine-tuned it on our specific dataset of thousands of retinal scans. This method, implemented in a Jupyter Notebook with PyTorch, allows the model to achieve high accuracy in disease classification.
+                </p>
+            </div>
+            <div class="tech-card animate-on-scroll">
+                <i class='bx bxs-conversation'></i>
+                <h3>AI-Powered Recommendations</h3>
+                <p>After a classification is made, we use Google's powerful Gemini AI to provide you with clear, empathetic explanations, precautions, and recommended next steps in multiple languages.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Information Section -->
+    <section id="diseases" class="section">
+        <h2 class="section-title animate-on-scroll">About Common Eye Diseases</h2>
+        <div class="expanders-container">
+            <details class="expander animate-on-scroll">
+                <summary>👁️ What is Diabetic Retinopathy?</summary>
+                <p>
+                    Diabetic Retinopathy is a complication of diabetes, caused by high blood sugar levels damaging the back of the eye (retina). It can lead to blindness if left undiagnosed and untreated.
+                </p>
+            </details>
+            
+            <details class="expander animate-on-scroll">
+                <summary>👁️ What is a Cataract?</summary>
+                <p>
+                    A cataract is a clouding of the normally clear lens of the eye. For people who have cataracts, seeing through cloudy lenses is a bit like looking through a frosty or fogged-up window.
+                </p>
+            </details>
+
+            <details class="expander animate-on-scroll">
+                <summary>👁️ What is Glaucoma?</summary>
+                <p>
+                    Glaucoma is a group of eye conditions that damage the optic nerve, which is vital for good vision. This damage is often caused by an abnormally high pressure in your eye.
+                </p>
+            </details>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // On-scroll animation functionality
+            const animatedElements = document.querySelectorAll('.animate-on-scroll');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target); 
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+
+            animatedElements.forEach(el => {
+                observer.observe(el);
+            });
+
+        });
+    </script>
+</body>
+</html>
