@@ -6,7 +6,7 @@ This project is a web-based application designed for the early detection of comm
 
 ### 🚀 Live Demo
 
--   **Main Landing Page:** [![Deployed on Vercel](https://eye-diseases.vercel.appl)
+-   **Main Landing Page:** [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://eye-diseases.vercel.appl)
 -   **Analyzer Tool:** [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://eyediseases.streamlit.app/)
 
 ---
