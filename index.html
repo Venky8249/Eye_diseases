@@ -22,6 +22,8 @@
             --accent-end: #00b4d8;
             --glass-bg: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.2);
+            --card-hover-border: rgba(0, 180, 216, 0.5);
+            --error-color: #ff6b6b;
         }
 
         * {
@@ -51,7 +53,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 100;
+            z-index: 1000;
             background: rgba(13, 12, 34, 0.5);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--glass-border);
@@ -64,6 +66,10 @@
             text-decoration: none;
         }
 
+        .navbar {
+            display: flex;
+        }
+
         .navbar a {
             margin-left: 35px;
             font-size: 1rem;
@@ -73,8 +79,14 @@
             transition: color 0.3s ease;
         }
 
-        .navbar a:hover {
+        .navbar a:hover, .navbar a.active {
             color: var(--accent-end);
+        }
+
+        #mobile-menu-icon {
+            display: none;
+            font-size: 2.5rem;
+            cursor: pointer;
         }
 
         /* --- Hero Section --- */
@@ -82,7 +94,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 12rem 2rem 8rem; /* Added top padding for header */
+            padding: 12rem 2rem 8rem;
             text-align: center;
             background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-gradient-end) 100%);
             border-bottom: 1px solid var(--glass-border);
@@ -127,7 +139,7 @@
 
         /* --- General Section Styling --- */
         .section {
-            padding: 5rem 2rem;
+            padding: 6rem 2rem;
             text-align: center;
         }
 
@@ -135,7 +147,7 @@
             font-size: 2.5rem;
             margin-bottom: 3rem;
         }
-
+        
         /* --- How It Works Section --- */
         .steps-container {
             display: flex;
@@ -145,43 +157,25 @@
             margin: 0 auto;
         }
 
-        .step {
-            flex: 1;
-            position: relative;
-        }
-
+        .step { flex: 1; position: relative; }
         .step-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            width: 80px; height: 80px; border-radius: 50%;
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            display: flex; justify-content: center; align-items: center;
             margin: 0 auto 1.5rem;
+            transition: all 0.3s ease;
         }
-        
-        .step-icon i {
-            font-size: 2.5rem;
-            color: var(--accent-end);
-        }
-
-        .step h3 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .step p {
-            color: var(--text-secondary);
-        }
+        .step:hover .step-icon { transform: scale(1.1); box-shadow: 0 0 15px var(--card-hover-border); }
+        .step-icon i { font-size: 2.5rem; color: var(--accent-end); }
+        .step h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .step p { color: var(--text-secondary); }
 
         /* --- Technology Section --- */
         .tech-container {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
@@ -191,116 +185,178 @@
             border-radius: 15px;
             padding: 2rem;
             text-align: center;
+            transition: all 0.3s ease;
         }
-
+        .tech-card:hover {
+             transform: translateY(-5px);
+             border-color: var(--card-hover-border);
+        }
         .tech-card i {
             font-size: 3.5rem;
             color: var(--accent-end);
             margin-bottom: 1rem;
         }
-
         .tech-card h3 {
             font-size: 1.5rem;
             margin-bottom: 1rem;
         }
-
         .tech-card p {
             color: var(--text-secondary);
         }
 
-        /* --- Information Section --- */
-        .expanders-container {
-            max-width: 800px;
+        /* --- Information/Disease Cards Section --- */
+        .disease-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
             margin: 0 auto;
-            text-align: left;
         }
-
-        .expander {
+        .disease-card {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             border-radius: 15px;
-            margin-bottom: 1rem;
-            transition: background-color 0.3s;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
         }
-
-        .expander[open] {
-            background: rgba(255, 255, 255, 0.08);
+        .disease-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--card-hover-border);
         }
-
-        .expander summary {
-            font-size: 1.2rem;
-            font-weight: 600;
-            padding: 1.5rem;
+        .disease-card i { font-size: 3rem; color: var(--accent-end); margin-bottom: 1rem; }
+        .disease-card h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .disease-card p { color: var(--text-secondary); margin-bottom: 1.5rem; }
+        .disease-card .learn-more-btn {
+            background: none;
+            border: 1px solid var(--accent-end);
+            color: var(--accent-end);
+            padding: 8px 20px;
+            border-radius: 20px;
             cursor: pointer;
-            list-style: none; /* Remove default arrow */
+            transition: all 0.3s ease;
+        }
+        .disease-card .learn-more-btn:hover {
+            background: var(--accent-end);
+            color: white;
+        }
+        
+        /* --- Footer --- */
+        .footer {
+            background-color: var(--bg-dark);
+            padding: 4rem 5% 2rem;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+        }
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+        .footer-col { flex: 1; min-width: 200px; }
+        .footer-col h4 { font-size: 1.2rem; margin-bottom: 1rem; color: var(--accent-end); }
+        .footer-col a, .footer-col p { color: var(--text-secondary); text-decoration: none; display: block; margin-bottom: 0.5rem; transition: color 0.3s ease;}
+        .footer-col a:hover { color: var(--text-primary); }
+        .footer-socials a { display: inline-block; margin-right: 15px; font-size: 1.5rem; }
+        .footer-bottom { margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--glass-border); font-size: 0.9rem; color: var(--text-secondary); }
+
+        /* --- Modal Styling --- */
+        .modal {
+            display: none; position: fixed; z-index: 1001;
+            left: 0; top: 0; width: 100%; height: 100%;
+            overflow: auto; background-color: rgba(0,0,0,0.7);
+            align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: var(--bg-dark);
+            margin: auto; padding: 30px;
+            border: 1px solid var(--glass-border);
+            border-radius: 15px; width: 80%; max-width: 600px;
             position: relative;
+            animation: fade-in-up 0.5s;
+        }
+        .modal-close {
+            color: #aaa; position: absolute; top: 15px; right: 25px;
+            font-size: 28px; font-weight: bold; cursor: pointer;
+        }
+        .modal-close:hover { color: white; }
+        .modal-content h3 { color: var(--accent-end); margin-bottom: 1rem; }
+        .modal-image-container {
+            width: 100%;
+            height: 300px; /* Fixed height for the image area */
+            background-color: var(--glass-bg);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center; /* Center text for error message */
+        }
+        .modal-content img { 
+            width: 100%; 
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px; 
+            display: none; /* Hidden by default */
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--glass-border);
+            border-top: 5px solid var(--accent-end);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .expander summary::after { /* Custom arrow */
-            content: '+';
-            position: absolute;
-            right: 1.5rem;
-            font-size: 1.5rem;
-            transition: transform 0.3s ease;
-        }
 
-        .expander[open] summary::after {
-            transform: rotate(45deg);
+        /* --- Back to Top Button --- */
+        .back-to-top {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 50px; height: 50px; background: var(--accent-end);
+            color: white; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 1.5rem; text-decoration: none;
+            opacity: 0; visibility: hidden; transition: all 0.4s;
         }
-
-        .expander p {
-            padding: 0 1.5rem 1.5rem 1.5rem;
-            color: var(--text-secondary);
-            font-size: 1rem;
-        }
+        .back-to-top.visible { opacity: 1; visibility: visible; }
 
         /* --- Animation Classes --- */
-        .animate-on-load {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fade-in-up 1s forwards;
-            animation-delay: 0.3s;
-        }
-
-        .animate-on-scroll {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-        }
-
-        .animate-on-scroll.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
+        .animate-on-load { opacity: 0; transform: translateY(20px); animation: fade-in-up 1s forwards; animation-delay: 0.3s; }
+        .animate-on-scroll { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+        .animate-on-scroll.visible { opacity: 1; transform: translateY(0); }
         @keyframes fade-in-up {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* --- Responsive Design --- */
         @media (max-width: 768px) {
             .navbar {
-                display: none; /* Hiding nav for simplicity, can be replaced with a mobile menu */
-            }
-            .hero-content h1 {
-                font-size: 2.5rem;
-            }
-            .hero-content p {
-                font-size: 1rem;
-            }
-            .section-title {
-                font-size: 2rem;
-            }
-            .tech-container, .steps-container {
-                grid-template-columns: 1fr;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--bg-dark);
                 flex-direction: column;
+                align-items: center;
+                padding: 1rem 0;
+                transform: translateY(-150%);
+                transition: transform 0.5s ease-in-out;
             }
-            .expander summary {
-                font-size: 1rem;
-            }
+            .navbar.active { transform: translateY(0); }
+            .navbar a { margin: 10px 0; }
+            #mobile-menu-icon { display: block; }
+
+            .hero-content h1 { font-size: 2.5rem; }
+            .hero-content p { font-size: 1rem; }
+            .section-title { font-size: 2rem; }
+            .steps-container { flex-direction: column; }
         }
     </style>
 </head>
@@ -309,12 +365,13 @@
     <!-- Header -->
     <header class="header">
         <a href="#" class="logo">EyeCare AI</a>
-        <nav class="navbar">
+        <nav class="navbar" id="navbar">
             <a href="#how-it-works">How It Works</a>
-            <a href="#technology">Our Technology</a>
-            <a href="#diseases">About Diseases</a>
-            <a href="https://eyediseases.streamlit.app/">Analyzer Tool</a>
+            <a href="#technology">Technology</a>
+            <a href="#diseases">Diseases</a>
+            <a href="https://eyediseases.streamlit.app/" class="cta-button" style="padding: 8px 20px; margin-left: 35px;">Analyzer Tool</a>
         </nav>
+        <i class='bx bx-menu' id="mobile-menu-icon"></i>
     </header>
 
     <!-- Hero Section -->
@@ -332,17 +389,17 @@
     <section id="how-it-works" class="section">
         <h2 class="section-title animate-on-scroll">How It Works</h2>
         <div class="steps-container">
-            <div class="step animate-on-scroll">
+            <div class="step animate-on-scroll" style="animation-delay: 0.2s;">
                 <div class="step-icon"><i class='bx bxs-cloud-upload'></i></div>
                 <h3>1. Upload Image</h3>
                 <p>Securely upload a retinal scan image from your device.</p>
             </div>
-            <div class="step animate-on-scroll">
+            <div class="step animate-on-scroll" style="animation-delay: 0.4s;">
                 <div class="step-icon"><i class='bx bxs-brain'></i></div>
                 <h3>2. AI Analysis</h3>
                 <p>Our dual-AI system classifies the image and generates a detailed report.</p>
             </div>
-            <div class="step animate-on-scroll">
+            <div class="step animate-on-scroll" style="animation-delay: 0.6s;">
                 <div class="step-icon"><i class='bx bxs-file-find'></i></div>
                 <h3>3. Get Results</h3>
                 <p>Instantly view the classification and listen to AI-generated advice.</p>
@@ -358,65 +415,195 @@
                 <i class='bx bxs-layer'></i>
                 <h3>Trained Classification Model</h3>
                 <p>
-                    Our core analysis uses a **Transfer Learning** approach. We started with a powerful, pre-trained **ResNet-18** model and fine-tuned it on our specific dataset of thousands of retinal scans. This method, implemented in a Jupyter Notebook with PyTorch, allows the model to achieve high accuracy in disease classification.
+                    Our core analysis uses a **Transfer Learning** approach with a powerful, pre-trained **ResNet-18** model, fine-tuned on thousands of retinal scans for high accuracy in disease classification.
                 </p>
             </div>
             <div class="tech-card animate-on-scroll">
                 <i class='bx bxs-conversation'></i>
                 <h3>AI-Powered Recommendations</h3>
-                <p>After a classification is made, we use Google's powerful Gemini AI to provide you with clear, empathetic explanations, precautions, and recommended next steps in multiple languages.</p>
+                <p>After classification, **Google's Gemini AI** provides clear, empathetic explanations, precautions, and recommended next steps in multiple languages and accents.</p>
             </div>
         </div>
     </section>
 
-    <!-- Information Section -->
+    <!-- Information/Disease Cards Section -->
     <section id="diseases" class="section">
         <h2 class="section-title animate-on-scroll">About Common Eye Diseases</h2>
-        <div class="expanders-container">
-            <details class="expander animate-on-scroll">
-                <summary>👁️ What is Diabetic Retinopathy?</summary>
-                <p>
-                    Diabetic Retinopathy is a complication of diabetes, caused by high blood sugar levels damaging the back of the eye (retina). It can lead to blindness if left undiagnosed and untreated.
-                </p>
-            </details>
-            
-            <details class="expander animate-on-scroll">
-                <summary>👁️ What is a Cataract?</summary>
-                <p>
-                    A cataract is a clouding of the normally clear lens of the eye. For people who have cataracts, seeing through cloudy lenses is a bit like looking through a frosty or fogged-up window.
-                </p>
-            </details>
-
-            <details class="expander animate-on-scroll">
-                <summary>👁️ What is Glaucoma?</summary>
-                <p>
-                    Glaucoma is a group of eye conditions that damage the optic nerve, which is vital for good vision. This damage is often caused by an abnormally high pressure in your eye.
-                </p>
-            </details>
+        <div class="disease-cards-container">
+            <div class="disease-card animate-on-scroll">
+                <i class='bx bxs-droplet'></i>
+                <h3>Diabetic Retinopathy</h3>
+                <p>A complication of diabetes caused by high blood sugar levels damaging the retina. It can lead to blindness if untreated.</p>
+                <button class="learn-more-btn" data-modal="dr-modal" data-disease="Diabetic Retinopathy">Learn More</button>
+            </div>
+            <div class="disease-card animate-on-scroll">
+                <i class='bx bxs-low-vision'></i>
+                <h3>Cataract</h3>
+                <p>A clouding of the normally clear lens of the eye, similar to looking through a frosty or fogged-up window.</p>
+                <button class="learn-more-btn" data-modal="cataract-modal" data-disease="Cataract">Learn More</button>
+            </div>
+            <div class="disease-card animate-on-scroll">
+                <i class='bx bxs-bolt-circle'></i>
+                <h3>Glaucoma</h3>
+                <p>A group of eye conditions that damage the optic nerve, often caused by abnormally high pressure in your eye.</p>
+                <button class="learn-more-btn" data-modal="glaucoma-modal" data-disease="Glaucoma">Learn More</button>
+            </div>
         </div>
     </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-col">
+                <h4>EyeCare AI</h4>
+                <p>Pioneering accessible eye health screening through the power of artificial intelligence.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#technology">Technology</a>
+                <a href="#diseases">Diseases</a>
+                <a href="https://eyediseases.streamlit.app/">Analyzer Tool</a>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                 <p><b>Disclaimer:</b> This tool is for educational purposes only and not a substitute for professional medical advice.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Follow Us</h4>
+                <div class="footer-socials">
+                    <a href="https://github.com/Venky8249"><i class='bx bxl-github'></i></a>
+                    <a href="https://www.linkedin.com/in/venkatesh-gummadidala-923419291/?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"><i class='bx bxl-linkedin'></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2025 EyeCare AI. All Rights Reserved.
+        </div>
+    </footer>
+    
+    <!-- Disease Modals -->
+    <div id="dr-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>Diabetic Retinopathy</h3>
+            <div class="modal-image-container">
+                <div class="loading-spinner"></div>
+                <img id="dr-image" src="diabetic.jpg" alt="Sample image of Diabetic Retinopathy">
+            </div>
+            <p>This condition occurs in people with diabetes. It's caused by damage to the blood vessels of the light-sensitive tissue at the back of the eye (retina). Initially, it might cause no symptoms or only mild vision problems. Eventually, it can cause blindness. Key signs our AI looks for include microaneurysms (small swellings in blood vessels), hemorrhages (bleeding), and hard exudates (lipid deposits).</p>
+        </div>
+    </div>
+    <div id="cataract-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>Cataract</h3>
+            <div class="modal-image-container">
+                 <div class="loading-spinner"></div>
+                 <img id="cataract-image" src="cataract.jpg" alt="Sample image of a Cataract">
+            </div>
+            <p>A cataract is a dense, cloudy area that forms in the lens of the eye. It begins when proteins in the eye form clumps that prevent the lens from sending clear images to the retina. The retina works by converting the light that comes through the lens into signals. It sends the signals to the optic nerve, which carries them to the brain. A cataract can make it difficult to read, drive a car (especially at night), or see the expression on a friend's face. The AI identifies this by detecting the characteristic opaqueness covering the lens.</p>
+        </div>
+    </div>
+    <div id="glaucoma-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>Glaucoma</h3>
+            <div class="modal-image-container">
+                <div class="loading-spinner"></div>
+                <img id="glaucoma-image" src="glaucoma.jpg" alt="Sample image of Glaucoma">
+            </div>
+            <p>Glaucoma is a disease that damages your eye’s optic nerve. It usually happens when fluid builds up in the front part of your eye, increasing the pressure and damaging the nerve. A key indicator for AI detection is an increased cup-to-disc ratio. The 'cup' is the center portion of the optic disc. In glaucoma, this cup becomes larger in proportion to the overall disc, which is a sign of nerve damage.</p>
+        </div>
+    </div>
+
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top"><i class='bx bx-up-arrow-alt'></i></a>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            // On-scroll animation functionality
-            const animatedElements = document.querySelectorAll('.animate-on-scroll');
+            // --- Mobile Menu Functionality ---
+            const mobileMenuIcon = document.getElementById('mobile-menu-icon');
+            const navbar = document.getElementById('navbar');
+            mobileMenuIcon.addEventListener('click', () => {
+                navbar.classList.toggle('active');
+            });
 
+            // --- On-scroll Animation ---
+            const animatedElements = document.querySelectorAll('.animate-on-scroll');
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('visible');
-                        observer.unobserve(entry.target); 
+                        observer.unobserve(entry.target);
                     }
                 });
-            }, {
-                threshold: 0.1
+            }, { threshold: 0.1 });
+            animatedElements.forEach(el => observer.observe(el));
+            
+            // --- Placeholder Image Modal Functionality ---
+            const modalBtns = document.querySelectorAll('.learn-more-btn');
+            
+            function showImageWithPlaceholder(modal, diseaseName) {
+                const imageElement = modal.querySelector('img');
+                const spinner = modal.querySelector('.loading-spinner');
+
+                // Reset state and show modal with spinner
+                spinner.style.display = 'block';
+                imageElement.style.display = 'none';
+                modal.style.display = "flex";
+
+                // Define placeholder URLs
+                const placeholders = {
+                    'Diabetic Retinopathy': 'diabetic.jpg',
+                    'Cataract': 'cataract.jpg',
+                    'Glaucoma': 'glaucoma.jpg' // <-- UPDATED LINE
+                };
+
+                // Simulate a network delay for a better UX
+                setTimeout(() => {
+                    // Set the image source to the placeholder
+                    imageElement.src = placeholders[diseaseName] || 'https://placehold.co/600x300/cccccc/000?text=Image+Not+Found';
+                    
+                    // Hide spinner and show image
+                    spinner.style.display = 'none';
+                    imageElement.style.display = 'block';
+                }, 1000); // 1-second delay
+            }
+
+            modalBtns.forEach(btn => {
+                btn.onclick = function() {
+                    const modalId = this.dataset.modal;
+                    const diseaseName = this.dataset.disease;
+                    const modal = document.getElementById(modalId);
+                    
+                    showImageWithPlaceholder(modal, diseaseName);
+                }
             });
 
-            animatedElements.forEach(el => {
-                observer.observe(el);
+            const closeBtns = document.querySelectorAll('.modal-close');
+            closeBtns.forEach(btn => {
+                btn.onclick = function() {
+                    this.closest('.modal').style.display = "none";
+                }
             });
 
+            window.onclick = function(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.style.display = "none";
+                }
+            }
+            
+            // --- Back to Top Button ---
+            const backToTopBtn = document.querySelector('.back-to-top');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) {
+                    backToTopBtn.classList.add('visible');
+                } else {
+                    backToTopBtn.classList.remove('visible');
+                }
+            });
         });
     </script>
 </body>
