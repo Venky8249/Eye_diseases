@@ -25,6 +25,12 @@ page_style = """
     background-color: #0c1445;
     background-image: linear-gradient(180deg, #0c1445 0%, #03045e 100%);
 }
+
+/* --- NEW: Make Header Transparent --- */
+[data-testid="stHeader"] {
+    background-color: transparent;
+}
+
 [data-testid="stVerticalBlock"] {
     background-color: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -34,6 +40,15 @@ page_style = """
 }
 h1, h2, h3, h4, h5, h6, p, div, label, li {
     color: #ffffff !important;
+}
+
+/* --- Sidebar Styling --- */
+[data-testid="stSidebar"] {
+    background-image: linear-gradient(180deg, #0c1445 0%, #03045e 100%);
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+[data-testid="stSidebar"] h2, [data-testid="stSidebar"] .stMarkdown {
+     color: #ffffff !important;
 }
 
 /* --- File Uploader Styling --- */
@@ -73,7 +88,7 @@ h1, h2, h3, h4, h5, h6, p, div, label, li {
     border: 1px solid rgba(0, 180, 216, 0.2);
 }
 
-/* --- NEW: Selectbox Styling (for visibility) --- */
+/* --- Selectbox Styling (for visibility) --- */
 [data-testid="stSelectbox"] > div {
     background-color: rgba(0, 119, 182, 0.3);
     border: 1px solid #00b4d8;
@@ -93,7 +108,7 @@ div[data-baseweb="popover"] ul li:hover {
     background-color: #0077b6;
 }
 
-/* --- NEW: Modern Animated Home Button --- */
+/* --- Modern Animated Home Button --- */
 .home-button {
     position: relative;
     z-index: 1;
@@ -108,6 +123,8 @@ div[data-baseweb="popover"] ul li:hover {
     font-weight: 600;
     overflow: hidden;
     transition: all 0.4s ease-in-out;
+    width: 100%; /* Make button fill sidebar width */
+    text-align: center;
 }
 .home-button:hover {
     transform: scale(1.05);
@@ -169,11 +186,20 @@ def classify_image(image, model, transform_fn, id2label_map):
         pred_index = torch.argmax(output, axis=1).item()
         return id2label_map[pred_index]
 
+# --- Sidebar Controls ---
+with st.sidebar:
+    st.title("Controls")
+    st.markdown('<a href="https://eye-diseases.vercel.app/" target="_self" class="home-button">🏠 Home</a>', unsafe_allow_html=True)
+    
+    st.markdown("### Audio Options")
+    languages = {"English": "en", "Hindi": "hi", "Bengali": "bn", "Korean": "ko", "Chinese": "zh-cn", "Japanese": "ja"}
+    accents = {"Default": "com", "India": "co.in", "United Kingdom": "co.uk", "United States": "com"}
+    out_lang_name = st.selectbox("Audio Language", list(languages.keys()))
+    english_accent_name = st.selectbox("English Accent", list(accents.keys()))
+    
+
 # --- Streamlit App UI ---
 st.title("👁️ AI Eye Image Analyzer")
-
-# Display the modern Home Button
-st.markdown('<a href="https://eye-diseases.vercel.app/" target="_self" class="home-button">🏠 Home</a>', unsafe_allow_html=True)
 
 st.write("Upload a medical image to get a classification and AI-powered advice.")
 st.warning("**Disclaimer:** This tool is for educational purposes only and is not a substitute for professional medical advice.", icon="⚠️")
@@ -195,12 +221,6 @@ if uploaded_file is not None:
     st.divider()
 
     st.subheader("Analysis & Precautions")
-    
-    with st.expander("Advanced Audio Options"):
-        languages = {"English": "en", "Hindi": "hi", "Bengali": "bn", "Korean": "ko", "Chinese": "zh-cn", "Japanese": "ja"}
-        accents = {"Default": "com", "India": "co.in", "United Kingdom": "co.uk", "United States": "com"}
-        out_lang_name = st.selectbox("Audio Language", list(languages.keys()))
-        english_accent_name = st.selectbox("English Accent", list(accents.keys()))
     
     if st.button("Analyze Image"):
         with st.spinner('Analyzing... This may take a moment.'):
