@@ -202,7 +202,7 @@ with st.sidebar:
 st.title("👁️ AI Eye Image Analyzer")
 
 st.write("Upload a medical image to get a classification and AI-powered advice.")
-#st.warning("**Disclaimer:** This tool is for educational purposes only and is not a substitute for professional medical advice.", icon="⚠️")
+st.warning("**Disclaimer:** This tool is for educational purposes only and is not a substitute for professional medical advice.", icon="⚠️")
 
 uploaded_file = st.file_uploader("Upload an image...", type=["png", "jpg", "jpeg"])
 
