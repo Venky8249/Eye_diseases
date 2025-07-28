@@ -4,21 +4,11 @@ from torchvision import models, transforms
 import torch.nn as nn
 from PIL import Image
 import google.generativeai as genai
-#from api_key import api_key
+from api_key import api_key
 from gtts import gTTS
 from deep_translator import GoogleTranslator
 import os
 
-
-try:
-    api_key = st.secrets["api_keys"]["api_key"]
-    #st.success("API key successfully loaded from secrets!")
-    # Now you can use the 'api_key' variable
-    # os.environ["YOUR_API_KEY_ENV_NAME"] = api_key # Optional: if a library needs it as an env var
-
-except KeyError:
-    st.error("API key not found. Please check your Streamlit secrets configuration.")
-    st.stop()
 
 # --- Page Configuration ---
 st.set_page_config(
