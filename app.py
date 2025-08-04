@@ -236,7 +236,7 @@ if uploaded_file is not None:
     if st.button("Analyze Image"):
         with st.spinner('Analyzing... This may take a moment.'):
             # --- Step 1: Use Gemini to check if the image is a valid eye scan ---
-            pre_classification_prompt = "Analyze this image. Is it a medical image of a human retina or eye, suitable for diagnosing conditions like diabetic retinopathy, glaucoma, or cataracts? Please answer with only 'Yes' or 'No'."
+            pre_classification_prompt = "Analyze this image. Is it a medical image of a human retina or eye, suitable for diagnosing conditions like diabetic retinopathy, glaucoma, normal or cataracts? Please answer with only 'Yes' or 'No'."
             
             try:
                 # Send the prompt and the image to the Gemini model
