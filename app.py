@@ -11,7 +11,6 @@ from gtts import gTTS
 from deep_translator import GoogleTranslator
 import os
 import traceback
-from api_key import OPENROUTER_API_KEY # <-- IMPORT THE KEY
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -142,7 +141,7 @@ st.markdown(page_style, unsafe_allow_html=True)
 
 
 # --- API Configuration ---
-# The API key is now imported from the api_key.py file
+OPENROUTER_API_KEY = "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"
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 HEADERS = {
     "Authorization": f"Bearer {OPENROUTER_API_KEY}",
@@ -187,13 +186,13 @@ def classify_image(image, model, transform_fn, id2label_map):
 with st.sidebar:
     st.title("Controls")
     st.markdown('<a href="https://eye-diseases.vercel.app/" target="_self" class="home-button">🏠 Home</a>', unsafe_allow_html=True)
-    
+
     st.markdown("### Audio Options")
     languages = {"English": "en", "Hindi": "hi", "Bengali": "bn", "Korean": "ko", "Chinese": "zh-cn", "Japanese": "ja"}
     accents = {"Default": "com", "India": "co.in", "United Kingdom": "co.uk", "United States": "com"}
     out_lang_name = st.selectbox("Audio Language", list(languages.keys()))
     english_accent_name = st.selectbox("English Accent", list(accents.keys()))
-    
+
 # --- Main App UI ---
 st.title("👁️ AI Eye Image Analyzer")
 st.write("Upload a medical image of an eye to get a classification and AI-powered advice.")
@@ -203,13 +202,13 @@ uploaded_file = st.file_uploader("Upload an image...", type=["png", "jpg", "jpeg
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert('RGB')
-    
+
     st.markdown("###### Uploaded Image")
     st.image(image, width=300)
     st.divider()
 
     st.subheader("Analysis & Precautions")
-    
+
     if 'analysis_done' not in st.session_state:
         st.session_state.analysis_done = False
     if 'predicted_class' not in st.session_state:
@@ -221,14 +220,15 @@ if uploaded_file is not None:
 
     if st.button("Analyze Image"):
         st.session_state.analysis_done = False
-        
+
         with st.spinner('Analyzing... This may take a moment.'):
             try:
                 base64_image = encode_image(image)
                 pre_classification_prompt = "Analyze this image. Is it a medical image of a human retina or eye, suitable for diagnosing conditions like diabetic retinopathy, glaucoma, normal or cataracts? Please answer with only 'Yes' or 'No'."
-                
+
+                # --- API Call using requests ---
                 data = {
-                    "model": "google/gemini-pro-1.5",
+                    "model": "google/gemini-2.5-flash", # <-- UPDATED MODEL
                     "messages": [{
                         "role": "user",
                         "content": [
@@ -239,22 +239,23 @@ if uploaded_file is not None:
                     "max_tokens": 10
                 }
                 response = requests.post(API_URL, headers=HEADERS, data=json.dumps(data))
-                response.raise_for_status()
+                response.raise_for_status() # Raise an exception for bad status codes
                 response_data = response.json()
                 is_eye_image = response_data['choices'][0]['message']['content'].strip().lower()
-                
+
                 if 'yes' in is_eye_image:
                     st.session_state.predicted_class = classify_image(image, classifier_model, classifier_transform, id2label)
                     
+                    # Using a concise prompt to avoid translation length errors
                     advice_prompt = f"""The user's retinal scan has been classified as '{st.session_state.predicted_class}'. 
                     Provide a helpful but CONCISE explanation of this condition (around 2-3 paragraphs). 
                     Then, list the MOST IMPORTANT precautions and recommend the next steps. 
                     Keep the tone empathetic and clear. The total response must be well under 4500 characters. 
                     Structure the response with clear headings. 
                     End with the mandatory disclaimer: 'This is AI-generated advice. Consult with a Doctor before making any decisions.'"""
-                    
+
                     advice_data = {
-                        "model": "google/gemini-pro-1.5",
+                        "model": "google/gemini-2.5-flash", # <-- UPDATED MODEL
                         "messages": [{"role": "user", "content": advice_prompt}]
                     }
                     advice_response = requests.post(API_URL, headers=HEADERS, data=json.dumps(advice_data))
@@ -265,9 +266,9 @@ if uploaded_file is not None:
                 else:
                     st.session_state.predicted_class = "Not an Eye Image"
                     not_eye_prompt = """The user has uploaded an image that is not a medical eye scan. First, briefly describe what is in this image. Then, in a new paragraph, add a clear and polite message telling the user that for the app to work, they must upload a retinal or fundus image of an eye."""
-                    
+
                     not_eye_data = {
-                        "model": "google/gemini-pro-1.5",
+                        "model": "google/gemini-2.5-flash", # <-- UPDATED MODEL
                         "messages": [{
                             "role": "user",
                             "content": [
@@ -285,7 +286,7 @@ if uploaded_file is not None:
                 output_language_code = languages[out_lang_name]
                 tld = accents[english_accent_name]
                 translated_text = GoogleTranslator(source='en', target=output_language_code).translate(st.session_state.ai_response)
-                
+
                 if translated_text:
                     tts = gTTS(translated_text, lang=output_language_code, tld=tld, slow=False)
                     os.makedirs("temp", exist_ok=True)
@@ -294,10 +295,10 @@ if uploaded_file is not None:
                     st.session_state.audio_file = file_path
                 else:
                     st.session_state.audio_file = None
-                
+
                 st.session_state.analysis_done = True
                 st.rerun()
-            
+
             except Exception as e:
                 st.error(f"An error occurred during analysis: {e}")
                 st.error("Full Technical Traceback:")
@@ -309,7 +310,7 @@ if uploaded_file is not None:
             st.warning(f"**Analysis Result: {st.session_state.predicted_class}**")
             st.markdown("#### AI Response:")
             st.write(st.session_state.ai_response)
-        
+
         else:
             st.success(f"**Predicted Disease: {st.session_state.predicted_class}**")
             st.markdown("#### AI Recommendations & Precautions:")
