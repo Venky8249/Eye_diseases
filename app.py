@@ -3,14 +3,10 @@ import torch
 from torchvision import models, transforms
 import torch.nn as nn
 from PIL import Image
-import requests
-import json
-import base64
-import io
+import google.generativeai as genai
 from gtts import gTTS
 from deep_translator import GoogleTranslator
 import os
-import traceback
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -27,10 +23,12 @@ page_style = """
     background-color: #0c1445;
     background-image: linear-gradient(180deg, #0c1445 0%, #03045e 100%);
 }
-/* ... (rest of your CSS is unchanged) ... */
+
+/* --- NEW: Make Header Transparent --- */
 [data-testid="stHeader"] {
     background-color: transparent;
 }
+
 [data-testid="stVerticalBlock"] {
     background-color: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -41,6 +39,8 @@ page_style = """
 h1, h2, h3, h4, h5, h6, p, div, label, li {
     color: #ffffff !important;
 }
+
+/* --- Sidebar Styling --- */
 [data-testid="stSidebar"] {
     background-image: linear-gradient(180deg, #0c1445 0%, #03045e 100%);
     border-right: 1px solid rgba(255, 255, 255, 0.2);
@@ -48,6 +48,8 @@ h1, h2, h3, h4, h5, h6, p, div, label, li {
 [data-testid="stSidebar"] h2, [data-testid="stSidebar"] .stMarkdown {
      color: #ffffff !important;
 }
+
+/* --- File Uploader Styling --- */
 [data-testid="stFileUploader"] {
     background-image: linear-gradient(180deg, #0c1445 0%, #03045e 100%);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -63,6 +65,8 @@ h1, h2, h3, h4, h5, h6, p, div, label, li {
 [data-testid="stFileUploader"] section svg {
     color: rgba(255, 255, 255, 0.8) !important;
 }
+
+/* --- Button Styling --- */
 [data-testid="stButton"] button {
     background-image: linear-gradient(45deg, #0077b6 0%, #00b4d8 100%);
     border: none;
@@ -74,11 +78,15 @@ h1, h2, h3, h4, h5, h6, p, div, label, li {
     box-shadow: 0 0 15px #90e0ef;
     transform: scale(1.05);
 }
+
+/* --- Expander Styling --- */
 [data-testid="stExpander"] {
     background-color: rgba(0, 180, 216, 0.1);
     border-radius: 10px;
     border: 1px solid rgba(0, 180, 216, 0.2);
 }
+
+/* --- Selectbox Styling (for visibility) --- */
 [data-testid="stSelectbox"] > div {
     background-color: rgba(0, 119, 182, 0.3);
     border: 1px solid #00b4d8;
@@ -97,6 +105,8 @@ div[data-baseweb="popover"] ul {
 div[data-baseweb="popover"] ul li:hover {
     background-color: #0077b6;
 }
+
+/* --- Modern Animated Home Button --- */
 .home-button {
     position: relative;
     z-index: 1;
@@ -140,25 +150,27 @@ div[data-baseweb="popover"] ul li:hover {
 st.markdown(page_style, unsafe_allow_html=True)
 
 
-# --- API Configuration ---
-OPENROUTER_API_KEY = "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"
-API_URL = "https://openrouter.ai/api/v1/chat/completions"
-HEADERS = {
-    "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-    "Content-Type": "application/json",
-}
+# --- Model Loading and Configuration ---
+# Configure the Generative AI model
+try:
+    
+    api_key=st.secrets["api_key"]
+    genai.configure(api_key=api_key)
+    gemini_model = genai.GenerativeModel(model_name="gemini-3-flash-preview")
+except Exception as e:
+    st.error(f"Could not configure Google Gemini AI. Please check your API key. Error: {e}")
+    st.stop()
 
-def encode_image(pil_image):
-    buffered = io.BytesIO()
-    pil_image.save(buffered, format="JPEG")
-    return base64.b64encode(buffered.getvalue()).decode('utf-8')
 
+# Load the pre-trained classifier model
 @st.cache_resource
 def load_classifier_model():
+    """Loads the pre-trained ResNet model for eye disease classification."""
     model = models.resnet18(weights=None)
     num_ftrs = model.fc.in_features
     model.fc = nn.Linear(num_ftrs, 4)
     try:
+        # Load the model state dictionary. Ensure the .pth file is in the same directory.
         model.load_state_dict(torch.load('retinopathy_model.pth', map_location=torch.device('cpu')))
     except FileNotFoundError:
         st.error("Model file 'retinopathy_model.pth' not found. Please make sure it's in the correct directory.")
@@ -168,6 +180,7 @@ def load_classifier_model():
 
 classifier_model = load_classifier_model()
 
+# Define the image transformations for the classifier
 classifier_transform = transforms.Compose([
     transforms.Resize((256, 256)),
     transforms.ToTensor(),
@@ -176,6 +189,7 @@ classifier_transform = transforms.Compose([
 id2label = {0: 'Normal', 1: 'Cataract', 2: 'Diabetic Retinopathy', 3: 'Glaucoma'}
 
 def classify_image(image, model, transform_fn, id2label_map):
+    """Classifies an image using the loaded model."""
     image_tensor = transform_fn(image).unsqueeze(0)
     with torch.no_grad():
         output = model(image_tensor)
@@ -186,15 +200,16 @@ def classify_image(image, model, transform_fn, id2label_map):
 with st.sidebar:
     st.title("Controls")
     st.markdown('<a href="https://eye-diseases.vercel.app/" target="_self" class="home-button">🏠 Home</a>', unsafe_allow_html=True)
-
+    
     st.markdown("### Audio Options")
     languages = {"English": "en", "Hindi": "hi", "Bengali": "bn", "Korean": "ko", "Chinese": "zh-cn", "Japanese": "ja"}
     accents = {"Default": "com", "India": "co.in", "United Kingdom": "co.uk", "United States": "com"}
     out_lang_name = st.selectbox("Audio Language", list(languages.keys()))
     english_accent_name = st.selectbox("English Accent", list(accents.keys()))
-
+    
 # --- Main App UI ---
 st.title("👁️ AI Eye Image Analyzer")
+
 st.write("Upload a medical image of an eye to get a classification and AI-powered advice.")
 st.warning("**Disclaimer:** This tool is for educational purposes only and is not a substitute for professional medical advice.", icon="⚠️")
 
@@ -202,13 +217,14 @@ uploaded_file = st.file_uploader("Upload an image...", type=["png", "jpg", "jpeg
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert('RGB')
-
+    
     st.markdown("###### Uploaded Image")
     st.image(image, width=300)
     st.divider()
 
     st.subheader("Analysis & Precautions")
-
+    
+    # Initialize session state if not present
     if 'analysis_done' not in st.session_state:
         st.session_state.analysis_done = False
     if 'predicted_class' not in st.session_state:
@@ -219,74 +235,41 @@ if uploaded_file is not None:
         st.session_state.audio_file = None
 
     if st.button("Analyze Image"):
-        st.session_state.analysis_done = False
-
         with st.spinner('Analyzing... This may take a moment.'):
+            # --- Step 1: Use Gemini to check if the image is a valid eye scan ---
+            pre_classification_prompt = "Analyze this image. Is it a medical image of a human retina or eye, suitable for diagnosing conditions like diabetic retinopathy, glaucoma, normal or cataracts? Please answer with only 'Yes' or 'No'."
+            
             try:
-                base64_image = encode_image(image)
-                pre_classification_prompt = "Analyze this image. Is it a medical image of a human retina or eye, suitable for diagnosing conditions like diabetic retinopathy, glaucoma, normal or cataracts? Please answer with only 'Yes' or 'No'."
+                # Send the prompt and the image to the Gemini model
+                response = gemini_model.generate_content([pre_classification_prompt, image])
+                is_eye_image = response.text.strip().lower()
 
-                # --- API Call using requests ---
-                data = {
-                    "model": "google/gemini-2.5-flash", # <-- UPDATED MODEL
-                    "messages": [{
-                        "role": "user",
-                        "content": [
-                            {"type": "text", "text": pre_classification_prompt},
-                            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}}
-                        ]
-                    }],
-                    "max_tokens": 10
-                }
-                response = requests.post(API_URL, headers=HEADERS, data=json.dumps(data))
-                response.raise_for_status() # Raise an exception for bad status codes
-                response_data = response.json()
-                is_eye_image = response_data['choices'][0]['message']['content'].strip().lower()
-
+                # --- Step 2: Branch logic based on the check ---
                 if 'yes' in is_eye_image:
+                    # --- IT IS AN EYE IMAGE: Proceed with original classification ---
                     st.session_state.predicted_class = classify_image(image, classifier_model, classifier_transform, id2label)
                     
-                    # Using a concise prompt to avoid translation length errors
-                    advice_prompt = f"""The user's retinal scan has been classified as '{st.session_state.predicted_class}'. 
-                    Provide a helpful but CONCISE explanation of this condition (around 2-3 paragraphs). 
-                    Then, list the MOST IMPORTANT precautions and recommend the next steps. 
-                    Keep the tone empathetic and clear. The total response must be well under 4500 characters. 
-                    Structure the response with clear headings. 
-                    End with the mandatory disclaimer: 'This is AI-generated advice. Consult with a Doctor before making any decisions.'"""
-
-                    advice_data = {
-                        "model": "google/gemini-2.5-flash", # <-- UPDATED MODEL
-                        "messages": [{"role": "user", "content": advice_prompt}]
-                    }
-                    advice_response = requests.post(API_URL, headers=HEADERS, data=json.dumps(advice_data))
-                    advice_response.raise_for_status()
-                    advice_response_data = advice_response.json()
-                    st.session_state.ai_response = advice_response_data['choices'][0]['message']['content'].strip()
+                    # Generate detailed medical advice using Gemini
+                    advice_prompt = f"""The user's retinal scan has been classified as '{st.session_state.predicted_class}'. Provide a helpful explanation of this condition, list detailed precautions, and recommend the next steps the user should take. Keep the tone empathetic and clear. Structure the response with clear headings. End with the mandatory disclaimer: 'This is AI-generated advice. Consult with a Doctor before making any decisions.'"""
+                    st.session_state.ai_response = gemini_model.generate_content(advice_prompt).text.strip()
 
                 else:
+                    # --- IT IS NOT AN EYE IMAGE: Describe and instruct ---
                     st.session_state.predicted_class = "Not an Eye Image"
-                    not_eye_prompt = """The user has uploaded an image that is not a medical eye scan. First, briefly describe what is in this image. Then, in a new paragraph, add a clear and polite message telling the user that for the app to work, they must upload a retinal or fundus image of an eye."""
+                    
+                    # Generate a description and instruction using Gemini
+                    not_eye_prompt = """The user has uploaded an image that is not a medical eye scan. 
+                    First, briefly describe what is in this image. 
+                    Then, in a new paragraph, add a clear and polite message telling the user that for the app to work, they must upload a retinal or fundus image of an eye."""
+                    st.session_state.ai_response = gemini_model.generate_content([not_eye_prompt, image]).text.strip()
 
-                    not_eye_data = {
-                        "model": "google/gemini-2.5-flash", # <-- UPDATED MODEL
-                        "messages": [{
-                            "role": "user",
-                            "content": [
-                                {"type": "text", "text": not_eye_prompt},
-                                {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}}
-                            ]
-                        }],
-                        "max_tokens": 300
-                    }
-                    not_eye_response = requests.post(API_URL, headers=HEADERS, data=json.dumps(not_eye_data))
-                    not_eye_response.raise_for_status()
-                    not_eye_response_data = not_eye_response.json()
-                    st.session_state.ai_response = not_eye_response_data['choices'][0]['message']['content'].strip()
-
+                # --- Step 3: Generate audio for the AI response (for both cases) ---
                 output_language_code = languages[out_lang_name]
                 tld = accents[english_accent_name]
+                
                 translated_text = GoogleTranslator(source='en', target=output_language_code).translate(st.session_state.ai_response)
-
+                
+                # Check if translation returned a non-empty string
                 if translated_text:
                     tts = gTTS(translated_text, lang=output_language_code, tld=tld, slow=False)
                     os.makedirs("temp", exist_ok=True)
@@ -294,27 +277,32 @@ if uploaded_file is not None:
                     tts.save(file_path)
                     st.session_state.audio_file = file_path
                 else:
-                    st.session_state.audio_file = None
-
-                st.session_state.analysis_done = True
-                st.rerun()
+                     st.session_state.audio_file = None
 
             except Exception as e:
                 st.error(f"An error occurred during analysis: {e}")
-                st.error("Full Technical Traceback:")
-                traceback_str = traceback.format_exc()
-                st.code(traceback_str)
+                st.session_state.ai_response = "Sorry, I couldn't process the image. Please try again."
+                st.session_state.predicted_class = "Error"
+            
+            st.session_state.analysis_done = True
+            st.rerun()
 
+    # --- Step 4: Display results based on the analysis outcome ---
     if st.session_state.analysis_done:
         if st.session_state.predicted_class == "Not an Eye Image":
             st.warning(f"**Analysis Result: {st.session_state.predicted_class}**")
             st.markdown("#### AI Response:")
             st.write(st.session_state.ai_response)
+        
+        elif st.session_state.predicted_class == "Error":
+            st.error(st.session_state.ai_response)
 
-        else:
+        else: # This is a successful disease prediction
             st.success(f"**Predicted Disease: {st.session_state.predicted_class}**")
             st.markdown("#### AI Recommendations & Precautions:")
             st.write(st.session_state.ai_response)
 
+        # Play audio if it was generated successfully
         if st.session_state.audio_file and os.path.exists(st.session_state.audio_file):
             st.audio(st.session_state.audio_file)
+            
